@@ -174,14 +174,6 @@ ARG USER
 # change your username so that during editing the file permission will not have an issue during save/ overwrite
 ENV USER ${USER}
 
-COPY ./aliases.sh /tmp/aliases.sh
-
-RUN sed -i 's/\r//' /tmp/aliases.sh && \
-    echo "" >> ~/.bashrc && \
-    echo "# Load Custom Aliases" >> ~/.bashrc && \
-    echo "source ~/aliases.sh" >> ~/.bashrc && \
-	echo "" >> ~/.bashrc
-
 # this is to add user so that wsl2 will not have permission issue when saving or using files
 # we use group id 1000 due to www-data be default is using 1000 group id. which we try to keep it consistent
 RUN addgroup --gid 1024 $USER && \

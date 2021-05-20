@@ -1,0 +1,43 @@
+version: '3'
+
+services:
+  php-nginx:
+    container_name: project-name-workspace
+    build:
+      # changed to use newer one
+      context: ./
+      dockerfile: Dockerfile
+      target: base
+      args:
+        - USER=${USER}
+    image: project-name-image
+    # image: bellbird/base-php-nginx:latest
+    volumes:
+
+    - ./:/var/www
+    # below you can use either files from development or staging
+    - ./development/laravel-pool.conf:/usr/local/etc/php-fpm.d/laravel-pool.conf
+    - ./development/cron:/etc/cron.d/cron
+    - ./development/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf
+    - ./development/laravel-worker.conf:/etc/supervisor/conf.d/laravel-worker.conf
+    - ./development/nginx.conf:/etc/nginx/nginx.conf
+    - ./development/default.conf:/etc/nginx/conf.d/default.conf
+    - ./development/closurv.test.conf:/etc/nginx/conf.d/closurv.test.conf
+    - ./docker/aliases.sh:/home/$USER/aliases.sh
+    - ./entrypoint-dev:/var/www/entrypoint-dev
+
+    networks:
+      - outside
+    ports:
+    - "80:80"
+    - "443:443"
+    - "9000:9000"
+    - "9001:9001"
+    - "6001:6001"
+    entrypoint: ["/var/www/entrypoint-dev"]
+    command: ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+    working_dir: /var/www
+networks:
+    outside:
+        external:
+          name: external-network-name

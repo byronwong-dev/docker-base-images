@@ -5,10 +5,14 @@ ENV USER ${USER}
 
 USER root
 
+RUN apt-get update && apt-get install dumb-init
+
 RUN adduser --disabled-password --gecos "" --force-badname --gid 1000 $USER
+
+RUN apt-get autoclean
 
 USER $USER
 
 WORKDIR /usr/app
 
-CMD [ "tail -f /dev/null" ]
+CMD ["/usr/bin/dumb-init", "--", "tail", "-f", "/dev/null"]
